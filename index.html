@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linkforce JHA Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #002d56;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    header img {
+      max-height: 50px;
+      margin-bottom: 10px;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h2 {
+      color: #002d56;
+    }
+    .job-step {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .hazard {
+      background: #eef3f8;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 12px 0;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #0055a4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #003f7d;
+    }
+    .output {
+      white-space: pre-wrap;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+      margin-top: 30px;
+      border-radius: 5px;
+    }
+    @media (max-width: 600px) {
+      input, textarea, button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="linkforce-logo.png" alt="Linkforce Logo">
+  <div style="font-size: 24px; font-weight: bold;">Linkforce JHA Generator</div>
+</header>
+
+<main>
+  <h2>Create Your Job Hazard Analysis</h2>
+
+  <div id="jobStepsContainer"></div>
+  <button onclick="addJobStep()">+ Add Job Step</button>
+  <br><br>
+  <button onclick="generateReport()">Generate JHA Report</button>
+
+  <div id="output" class="output">Your JHA report will appear here...</div>
+</main>
+
+<script>
+let jobStepCounter = 0;
+
+function addJobStep() {
+  const container = document.getElementById("jobStepsContainer");
+  const stepDiv = document.createElement("div");
+  stepDiv.className = "job-step";
+  stepDiv.id = "jobStep" + jobStepCounter;
+
+  stepDiv.innerHTML = `
+    <h3>Job Step ${jobStepCounter + 1}</h3>
+    <label>Step Description:</label>
+    <input type="text" placeholder="e.g. Lock on / Sign on" class="stepDesc"/>
+
+    <div class="hazards-container" id="hazards${jobStepCounter}"></div>
+    <button onclick="addHazard(${jobStepCounter})" type="button">+ Add Hazard/Control</button>
+  `;
+
+  container.appendChild(stepDiv);
+  addHazard(jobStepCounter);
+  jobStepCounter++;
+}
+
+function addHazard(stepId) {
+  const hazardContainer = document.getElementById("hazards" + stepId);
+  const hazardDiv = document.createElement("div");
+  hazardDiv.className = "hazard";
+
+  hazardDiv.innerHTML = `
+    <label>Hazard / Risk:</label>
+    <textarea rows="2" placeholder="Describe the hazard or risk..." class="hazardText"></textarea>
+    <label>Controls:</label>
+    <textarea rows="2" placeholder="List control measures..." class="controlText"></textarea>
+  `;
+
+  hazardContainer.appendChild(hazardDiv);
+}
+
+function generateReport() {
+  const steps = document.querySelectorAll(".job-step");
+  let report = "";
+
+  steps.forEach((step, index) => {
+    const stepDesc = step.querySelector(".stepDesc").value.trim();
+    report += "Job Step " + (index + 1) + ": " + stepDesc + "\n";
+
+    const hazards = step.querySelectorAll(".hazard");
+    hazards.forEach((hz, hIndex) => {
+      const hazardText = hz.querySelector(".hazardText").value.trim();
+      const controlText = hz.querySelector(".controlText").value.trim();
+      report += "  Hazard " + (hIndex + 1) + ":\n    " + hazardText + "\n";
+      report += "  Controls:\n    - " + controlText.replace(/\n/g, "\n    - ") + "\n";
+    });
+
+    report += "\n";
+  });
+
+  document.getElementById("output").innerText = report.trim();
+}
+</script>
+
+</body>
+</html>
